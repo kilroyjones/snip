@@ -1,0 +1,203 @@
+PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys;
+
+DROP TABLE snippets;
+DROP TABLE snippets_fts;
+DROP TABLE tags;
+DROP TABLE snippet_to_tags;
+
+CREATE TABLE snippets (
+    id integer PRIMARY KEY, 
+    date text NOT NULL,
+    content text NOT NULL,
+    filename text, 
+    filetype text, 
+    snippet_group_id integer, 
+    description text,
+    FOREIGN KEY (snippet_group_id) REFERENCES snippet_groups (id)
+);
+
+CREATE TABLE snippet_groups (
+    id integer PRIMARY KEY,
+    count integer NOT NULL
+);
+
+CREATE VIRTUAL TABLE snippets_fts USING fts5 (
+    id UNINDEXED, 
+    date UNINDEXED, 
+    filetype UNINDEXED,
+    single UNINDEXED,
+    snippet_group_id UNINDEXED,
+    filename,  
+    content,
+    description,
+    content='snippets',
+    filename='snippets',
+    description='snippet',
+    content_rowid='id'
+);
+
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY, 
+    tag TEXT NOT NULL
+);
+
+CREATE VIRTUAL TABLE tags_
+
+CREATE TABLE snippet_to_tags (
+    snippet_id INTEGER NOT NULL,
+    tags_id INTEGER NOT NULL,
+    FOREIGN KEY (snippet_id) REFERENCES snippets (id),
+    FOREIGN KEY (tags_id) REFERENCES tags (id)
+);
+
+
+    // if file_exists {
+    // HANDLE FILE AS NORMAL
+    // } else if {
+
+    // }
+
+    // conn.execute("INSERT INTO snippets (date, filename, content) VALUES(\"01/02/92\", \"test\", \"a snippet\");", ())?;
+    // let mut clipboard = Clipboard::new().unwrap();
+    // println!("{}", clipboard.get_text().unwrap());
+
+    // let mut cmd = "";
+    // if let Some(command) = args.command.as_deref() {
+    //     match command {
+    //         "clipboard" | "clip" | "c" => {
+    //             let snippet = clipboard.get_text().unwrap();
+    //             println!("Add to db");
+    //             let _ = conn.execute(
+    //                 "INSERT INTO snippets (date, filename, content) VALUES(?1, ?2, ?3)",
+    //                 ("01/02/92", "test", &snippet),
+    //             )?;
+    //         }
+
+    //         _ => println!("invalid command"),
+    //     }
+    // }
+
+    // let mut tags = vec![];
+    // let mut filenames = vec![];
+
+    // add_snippet(&conn);
+
+use std::error::Error;
+
+pub fn search_db(db: Connection, search_term: String) -> Result<(), Box<dyn Error>> {
+    let mut select_statement = db
+        .prepare_cached("SELECT * FROM snippets_fts WHERE snippet MATCH :search_term OR description MATCH :search_term").unwrap();
+
+    println!("fuck");
+    let mut results: Vec<String> = Vec::new();
+    // let mut select_statement = db
+    //     .prepare_cached("SELECT * FROM snippets_fts WHERE snippet MATCH 'foo'")
+    //     .unwrap();
+
+    let mut rows = match select_statement
+        .query(named_params! {":search_term": search_term})
+        // .query([])
+    {
+        Ok(rows) => {
+            println!("Here with rows");
+            rows
+        }
+        Err(e) => {
+            println!("{:?}", e);
+            return Ok(());
+        }
+    };
+
+    results.clear();
+    while let Some(row) = rows.next()? {
+        let a: String = row.get(2)?;
+        results.push(a);
+    }
+    println!("{}", results.len());
+    Ok(())
+}
+        // This is where you add new widgets.
+        // See the following resources:
+        // - https://docs.rs/tui/0.16.0/tui/widgets/index.html
+        // - https://github.com/fdehau/tui-rs/tree/v0.16.0/examples
+
+        let temp = get_formatted_document();
+        let block = Block::default();
+        let area = Rect::new(0, 0, 5, 5);
+        frame.render_widget(block, area);
+        let rows = Layout::default()
+            .direction(Direction::Vertical)
+            .margin(1)
+            .constraints([Constraint::Percentage(100)].as_ref())
+            .split(frame.size());
+        let temp = format!("{}", "oh this works?".red());
+        // let items = vec![Text::raw(temp)];
+        // let list = List::new(items.into_iter());
+        let rect = Rect::new(200, 100, 10, 10);
+        let buffer = Buffer::empty(rect);
+        let doc = Paragraph::new("").block(Block::default().borders(Borders::ALL).title("Search"));
+        // let size = frame.size();
+        // let label = Label::default().text(format!("{}", "oh this works?".red()));
+        // let block = Block::default();
+        // println!("{}", temp);
+        let mut state = ListState::default();
+
+        let items = vec![
+            ListItem::new(format!("{}", "Item 1".red())),
+            ListItem::new("Item 2"),
+        ];
+        let list = List::new(items);
+        let block = Block::default();
+        let area = Rect::new(0, 0, 5, 5);
+        // let mut frame = terminal.get_frame();
+        // frame.render_widget(block, area);
+
+        frame.render_stateful_widget(list, area, &mut state);
+        // frame.render_widget(list, area, rows[0]);
+        return;
+
+
+    /// Builds the search results
+    pub fn search_results<'a>(&'a mut self, rows: &Vec<Rect>) -> Paragraph {
+        let mut listing: Vec<Spans> = Vec::new();
+        let mut idx: i32 = 0;
+        let mut results = self.search_results.clone();
+        for item in self.search_results.clone() {
+            let filename = get_filename(item.filename);
+            let preview = get_snippet_preview(item.preview);
+
+            listing.push(Spans::from(vec![Span::styled(
+                filename,
+                Style::default().fg(Color::LightBlue),
+            )]));
+
+            listing.push(Spans::from(vec![Span::styled(
+                item.description,
+                Style::default().fg(Color::LightYellow),
+            )]));
+
+            listing.push(Spans::from(vec![Span::styled(
+                preview,
+                Style::default().fg(Color::LightGreen),
+            )]));
+
+            // if idx == self.cursor_position {
+            //     listing.push(ListItem::new(spans));
+            // } else {
+            //     listing.push(ListItem::new(spans).style(Style::default().fg(Color::White)));
+            // }
+            idx += 1;
+        }
+        // let items = List::new(listing)
+        //     .block(Block::default().borders(Borders::ALL).title("List"))
+        //     .highlight_style(
+        //         Style::default()
+        //             .bg(Color::LightGreen)
+        //             .add_modifier(Modifier::BOLD),
+        //     )
+        //     .highlight_symbol(">> ");
+        // items
+        // listing
+        Paragraph::new(listing).block(Block::default().title("Results"))
+    }

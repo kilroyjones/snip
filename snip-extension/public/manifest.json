@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Snip",
+  "description": "Extension that extends things",
+  "author": "Me",
+  "version": "0.1",
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "./build/background.js"
+  },
+  "permissions": ["scripting", "contextMenus", "activeTab", "storage", "clipboardWrite", "tabs"],
+  "commands": {
+    "snip": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Snip"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["./build/inject.js"],
+      "css": ["./global.css"],
+      "run_at": "document_end",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "action": {
+    "default_popup": "index.html"
+  }
+}

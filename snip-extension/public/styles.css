@@ -1,0 +1,59 @@
+input.u-full-width {
+  border-radius: 5px;
+  padding: 0 5px !important;
+  width: 100%;
+}
+
+input.u-full-width:hover {
+  border: 1px solid #373737 !important;
+}
+
+#tagBtn:hover {
+  background-color: #cbcbcb !important;
+  cursor: pointer !important;
+  -webkit-user-select: none !important; /* Safari */
+  -moz-user-select: none !important; /* Firefox */
+  -ms-user-select: none !important; /* IE10+/Edge */
+  user-select: none !important; /* Standard */
+}
+
+.tags {
+  margin-top: 15px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 15px;
+  height: 30px;
+  font-size: 11px;
+  line-height: 30px;
+  border-radius: 25px;
+  background-color: #eaeaea;
+  margin: 3px;
+}
+
+.closebtn {
+  padding-left: 13px;
+  color: #888;
+  font-weight: 100;
+  float: right;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  color: #000;
+}
+
+.toggleMenu {
+  display: none !important;
+}
+
+@keyframes modalopen {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

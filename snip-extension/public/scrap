@@ -1,0 +1,148 @@
+{
+  "manifest_version": 2,
+  "name": "Snip extension",
+  "version": "0.1",
+  "background": {
+    "scripts": [
+      "build/background.js"
+    ]
+  },
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "tabs",
+    "<all_urls>",
+    "contextMenus",
+    "activeTab"
+  ],
+  "action": {},
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "build/content.js"
+      ]
+    }
+  ],
+  "commands": {
+    "snip": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Snip"
+    }
+  }
+}
+
+  // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  //   chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, function (response) {
+  //     console.log(response.farewell);
+  //   });
+  // });
+});
+
+// function sendMessageBackgroundToScript(tab) {
+//   chrome.tabs.sendMessage(tab.id, { text: "This is a message" });
+// }
+// chrome.action.onClicked.addListener(sendMessageBackgroundToScript);
+  const init = function () {
+    const hostElement = document.createElement("div");
+    hostElement.className = "hostElement";
+    document.body.appendChild(hostElement);
+
+    var host = document.querySelector(".hostElement");
+    var root = host.attachShadow({ mode: "open" });
+    var div = document.createElement("div");
+    div.className = "div root-class";
+    div.innerHTML = `
+      <script>
+          function close() {
+            var element = document.querySelector('div.hostElement');
+            element.parentElement.removeChild(element);
+          }
+      </script>
+      <style>
+        #snip-search-footer {
+            position: fixed;
+            padding: 10px 10px 0px 10px;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: grey;
+        }
+      </style> 
+      <div id="snip-search-footer"> Put some stuff in here
+      <button onclick="close()">press</button>
+      </div>
+      `;
+    root.appendChild(div);
+  };
+  init();
+
+// if (typeof init === "undefined") {
+//   // Add bubble to the top of the page.
+//   var bubbleDOM = document.createElement("div");
+//   bubbleDOM.setAttribute("class", "selection_bubble");
+//   document.body.appendChild(bubbleDOM);
+
+//   // Lets listen to mouseup DOM events.
+//   document.addEventListener(
+//     "mouseup",
+//     function (e) {
+//       var selection = window.getSelection().toString();
+//       if (selection.length > 0) {
+//         renderBubble(e.clientX, e.clientY, selection);
+//       }
+//     },
+//     false
+//   );
+
+//   // Close the bubble when we click on the screen.
+//   document.addEventListener(
+//     "mousedown",
+//     function (e) {
+//       bubbleDOM.style.visibility = "hidden";
+//     },
+//     false
+//   );
+
+//   // Move that bubble to the appropriate location.
+//   function renderBubble(mouseX, mouseY, selection) {
+//     bubbleDOM.innerHTML = selection;
+//     bubbleDOM.style.top = mouseY + "px";
+//     bubbleDOM.style.left = mouseX + "px";
+//     bubbleDOM.style.visibility = "visible";
+//   }
+// }
+ const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+  let result;
+  try {
+    [{result}] = await chrome.scripting.executeScript({
+      target: {tabId: tab.id},
+      function: () => getSelection().toString(),
+    });
+  } catch (e) {
+    return; // ignoring an unsupported page like chrome://extensions
+  }
+// chrome.commands.onCommand.addListener(command => {
+//   console.log(`Command: ${command}`);
+//   chrome.storage.local.get(["snipSearchBar"], function (result) {
+//     console.log(result.snipSearchBar);
+//   });
+// }
+
+// try {
+//   chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+//     if (changeInfo.status == "complete") {
+//       chrome.scripting.executeScript({
+//         files: ["./build/inject.js"],
+//         target: { tabId: tab.id },
+//       });
+//     }
+//   });
+// } catch (e) {
+//   console.log(e);
+// }
